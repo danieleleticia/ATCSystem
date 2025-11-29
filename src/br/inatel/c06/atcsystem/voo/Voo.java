@@ -3,7 +3,7 @@ package br.inatel.c06.atcsystem.voo;
 import br.inatel.c06.atcsystem.aeronave.Aeronave;
 import br.inatel.c06.atcsystem.pista.Pista;
 import br.inatel.c06.atcsystem.controle.TorreDeControle;
-import br.inatel.c06.atcsystem.Registravel;
+import br.inatel.c06.atcsystem.interfaces.Registravel;
 
 public class Voo implements Runnable, Registravel
 {
@@ -95,7 +95,7 @@ public class Voo implements Runnable, Registravel
             }
         }
 
-        @Override
+       @Override
         public void registrarEvento(String mensagem) {
             System.out.println("[VOO " + codigo + "] " + mensagem);
             // Opcional: também gravar em arquivo (requisito do professor) — posso adicionar se quiser

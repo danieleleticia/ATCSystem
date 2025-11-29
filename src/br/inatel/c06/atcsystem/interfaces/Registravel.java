@@ -1,5 +1,6 @@
 package br.inatel.c06.atcsystem.interfaces;
 
-public class Registravel
+public interface Registravel
 {
+        public void registrarEvento(String mensagem);
 }
