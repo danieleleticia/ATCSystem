@@ -1,0 +1,17 @@
+[LOG] Sistema inicializado.
+==== Fila inicial de prioridades (Aeronaves) ====
+1) [PRIO=5] Aeronave PT-XYZ (Airbus A320)
+2) [PRIO=5] Aeronave PT-CGO (Boeing 747)
+3) [PRIO=2] Aeronave PT-ABC (Boeing 737)
+================================================
+
+[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-001
+[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-002
+[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-003
+
+==== Fila final de prioridades (Aeronaves) ====
+1) [PRIO=5] Aeronave PT-XYZ (Airbus A320)
+2) [PRIO=2] Aeronave PT-ABC (Boeing 737)
+===============================================
+
+[LOG] Sistema finalizado.

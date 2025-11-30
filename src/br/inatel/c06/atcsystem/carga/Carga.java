@@ -6,11 +6,15 @@ public class Carga {
     private boolean sensivel;
     private boolean perecivel;
 
-    public Carga(double peso, String nome, boolean sensivel)
-    {
+    public Carga(double peso, String nome, boolean sensivel, boolean perecivel) {
+        if (peso <= 0) {
+            throw new IllegalArgumentException("O peso da carga deve ser positivo.");
+        }
+
         this.peso = peso;
         this.nome = nome;
         this.sensivel = sensivel;
+        this.perecivel = perecivel;
     }
 
     public String getNome() {

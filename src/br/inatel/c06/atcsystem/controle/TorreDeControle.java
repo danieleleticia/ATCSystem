@@ -1,5 +1,6 @@
 package br.inatel.c06.atcsystem.controle;
 
+import br.inatel.c06.atcsystem.arquivos.LogSistema;
 import br.inatel.c06.atcsystem.voo.Voo;
 import br.inatel.c06.atcsystem.aeronave.Aeronave;
 import br.inatel.c06.atcsystem.pista.Pista;
@@ -7,14 +8,14 @@ import br.inatel.c06.atcsystem.pista.Pista;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Iterator;
 
-public class TorreDeControle
-{
+public class TorreDeControle implements Runnable {
         private List<Aeronave> aeronavesDisponiveis = new ArrayList<>();
         private List<Aeronave> aeronavesEmOperacao = new ArrayList<>();
         private List<Pista> pistas = new ArrayList<>();
         private List<Voo> voosAguardando = new ArrayList<>();
+
+        private volatile boolean sistemaAtivo = true;
 
         // cadastro
         public void adicionarAeronave(Aeronave a) {
@@ -92,6 +93,8 @@ public class TorreDeControle
                 t.setName("Voo-" + voo.getCodigo());
                 t.start();
 
+                LogSistema.registrarAlocacao(a, voo);
+
                 // Remove voo da lista aguardando (será notificado quando finalizar)
                 synchronized (voosAguardando) {
                     voosAguardando.remove(voo);
@@ -100,6 +103,15 @@ public class TorreDeControle
                 System.out.println("ATC: Disparado voo " + voo.getCodigo()
                         + " com aeronave " + a.getMatricula()
                         + " na pista " + pistaLivre.getId());
+            }
+        }
+
+        public List<Aeronave> obterCopiaFilaPrioridade() {
+            synchronized (aeronavesDisponiveis) {
+                List<Aeronave> copia = new ArrayList<>(aeronavesDisponiveis);
+                // ordena da MAIOR prioridade de pouso para a menor
+                copia.sort(Comparator.comparingInt(Aeronave::getPrioridadePouso).reversed());
+                return copia;
             }
         }
 
@@ -150,6 +162,31 @@ public class TorreDeControle
             // Pista já foi liberada pelo próprio Voo -> nada a fazer aqui
             System.out.println("ATC: Voo " + voo.getCodigo() + " finalizado e processado.");
         }
+
+    @Override
+    public void run() {
+        System.out.println("ATC: Thread da torre iniciada.");
+        while (sistemaAtivo) {
+
+            processarVoos();
+
+            try {
+                // Pausa pequena para não ficar 100% do tempo ocupando CPU
+                Thread.sleep(500); // 0,5 segundo
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.out.println("ATC: Thread da torre interrompida.");
+                break;
+            }
+        }
+        System.out.println("ATC: Por hoje é só");
+    }
+
+    public void desligar() {
+        sistemaAtivo = false;
+    }
+
+
 }
 
 

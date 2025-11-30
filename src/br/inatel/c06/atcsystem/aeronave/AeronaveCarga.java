@@ -99,7 +99,9 @@ public class AeronaveCarga extends Aeronave {
             if (prioridade < 3) {
                 prioridade = 3;
             }
-        }
+        } else
+            prioridade = 1;
+
         if (prioridade < 1 || prioridade > 5) {
             throw new PrioridadeInvalidaException("A prioridade calculada ficou fora do intervalo 1..5.");
         }

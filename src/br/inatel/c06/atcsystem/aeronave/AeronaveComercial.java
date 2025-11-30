@@ -3,6 +3,7 @@ package br.inatel.c06.atcsystem.aeronave;
 public class AeronaveComercial extends Aeronave{
     private String companhia;
     private int qtdPassageiros;
+    private boolean emergencia = false;
 
     public AeronaveComercial(String modelo, String matricula, double combustivel, double pesoAtual, int prioridadeAtual, String companhia, int qtdPassageiros) {
 
@@ -24,9 +25,15 @@ public class AeronaveComercial extends Aeronave{
         return qtdPassageiros;
     }
 
+    public void emergenciaMedica() {
+        this.emergencia = true;
+        atualizaPrioridade();
+    }
+
     @Override
     public void atualizaPrioridade() {
-        //implementar com a emergencia na classe voo
+        if(emergencia)
+            this.prioridadeAtual = 5;
     }
 
     @Override

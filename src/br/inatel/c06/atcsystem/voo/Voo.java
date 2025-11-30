@@ -5,8 +5,7 @@ import br.inatel.c06.atcsystem.pista.Pista;
 import br.inatel.c06.atcsystem.controle.TorreDeControle;
 import br.inatel.c06.atcsystem.interfaces.Registravel;
 
-public class Voo implements Runnable, Registravel
-{
+public class Voo implements Runnable, Registravel {
     public enum TipoOperacao { DECOLAGEM, POUSO }
     public enum StatusVoo { AGUARDANDO, EM_OPERACAO, FINALIZADO }
 
@@ -47,11 +46,14 @@ public class Voo implements Runnable, Registravel
         public Aeronave getAeronave() { return aeronave; }
         public Pista getPista() { return pista; }
         public TipoOperacao getTipo() { return tipo; }
+        public String getOrigem() { return origem; }
+        public String getDestino() { return destino; }
 
         // Retorna prioridade consultando a aeronave (se houver)
         public int getPrioridade() {
             return aeronave != null ? aeronave.getPrioridadePouso() : 0;
         }
+
 
         @Override
         public void run() {
