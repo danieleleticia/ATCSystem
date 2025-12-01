@@ -12,7 +12,6 @@ import java.util.List;
 
 public class LogSistema {
 
-    // CORREÇÃO 1: Tirei o "src/" para salvar na raiz do projeto. É mais seguro.
     private static Path CAMINHO_ARQUIVO = Paths.get("src/log_sistema.txt");
 
     private static synchronized void escreverLinha(String linha) {
@@ -24,21 +23,16 @@ public class LogSistema {
                     StandardOpenOption.APPEND
             );
         } catch (IOException e) {
-            // Imprime no console vermelho para você ver se der erro
             System.err.println("ERRO CRÍTICO AO GRAVAR LOG: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // ---------- MÉTODOS ATUALIZADOS PARA RECEBER 'VOO' ----------
-
     private static String formatarVoo(Voo v) {
-        // Agora pegamos a prioridade do VOO, que pode ter mudado
         return "[PRIO=" + v.getPrioridade() + "] Voo " + v.getCodigo()
                 + " - Aeronave " + v.getAeronave().getMatricula();
     }
 
-    // Agora recebe Lista de VOO, pois é isso que a Torre tem
     public static void registrarFilaInicial(List<Voo> filaVoos) {
         escreverLinha("==== Fila inicial de Voos ====");
         int pos = 1;
@@ -50,7 +44,6 @@ public class LogSistema {
         escreverLinha("");
     }
 
-    // Mantivemos esse para registrar quando o avião ganha a pista
     public static void registrarAlocacao(Aeronave a, Voo v) {
         escreverLinha("[ALOCACAO] " + v.getCodigo() + " assumiu a pista " + v.getPista()+ "com " + a.getMatricula());
     }

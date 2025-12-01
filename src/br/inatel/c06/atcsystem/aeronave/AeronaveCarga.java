@@ -9,9 +9,9 @@ public class AeronaveCarga extends Aeronave {
     private double capacidadeMaxCarga;
     private ArrayList<Carga> listaCargas;
 
-    public AeronaveCarga(String modelo, String matricula, double combustivel, double pesoAtual, double tamanho, int prioridadeAtual, double capacidadeMaxCarga) {
+    public AeronaveCarga(String modelo, String matricula, double combustivel, double tamanho, double pesoAtual, int prioridadeAtual, double capacidadeMaxCarga) {
 
-        super(modelo, matricula, combustivel, pesoAtual,tamanho, prioridadeAtual);
+        super(modelo, matricula, combustivel, tamanho, pesoAtual, prioridadeAtual);
 
         if (capacidadeMaxCarga <= 0) {
             throw new IllegalArgumentException("A capacidade máxima de carga deve ser positiva.");
@@ -20,22 +20,11 @@ public class AeronaveCarga extends Aeronave {
         this.capacidadeMaxCarga = capacidadeMaxCarga;
         this.listaCargas = new ArrayList<Carga>();
     }
-
-
-    public double getCapacidadeMaxCarga() {
-        return capacidadeMaxCarga;
-    }
-
-    public ArrayList<Carga> getListaCargas() {
-        return listaCargas;
-    }
-
     public void adicionarCarga(Carga novaCarga) {
 
         if (novaCarga == null) {
             throw new IllegalArgumentException("A carga não pode ser nula.");
         }
-
         double pesoNovo = calcularPesoTotalCarga() + novaCarga.getPeso();
 
         if (pesoNovo > capacidadeMaxCarga) {
@@ -107,7 +96,6 @@ public class AeronaveCarga extends Aeronave {
         }
         this.prioridadeAtual = prioridade;
     }
-
     @Override
     public int getPrioridadePouso() {
         return this.prioridadeAtual;
@@ -115,14 +103,14 @@ public class AeronaveCarga extends Aeronave {
 
     @Override
     public String exibirInformacoes() {
-        return "AeronaveCarga{" +
-                "modelo='" + modelo +
-                ", matricula='" + matricula +
-                ", combustivel=" + combustivel +
-                ", pesoAtual=" + pesoAtual +
-                ", prioridadeAtual=" + prioridadeAtual +
-                ", capacidadeMaxCarga=" + capacidadeMaxCarga +
-                ", pesoTotalCarga=" + calcularPesoTotalCarga() +
-                ", cargas=" + listaCargas + '}';
+        return "AeronaveCarga " +
+                "" + modelo +
+                " , Matricula " + matricula +
+                " , Combustivel: " + combustivel +
+                " , PesoAtual: " + pesoAtual +
+                " , PrioridadeAtual: " + prioridadeAtual +
+                " ,\nCapacidadeMaxCarga: " + capacidadeMaxCarga +
+                " , PesoTotalCarga " + calcularPesoTotalCarga() +
+                " , Cargas " + listaCargas + '}';
     }
 }

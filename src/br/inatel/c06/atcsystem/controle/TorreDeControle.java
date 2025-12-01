@@ -15,6 +15,7 @@ public class TorreDeControle implements Runnable {
     private List<Pista> pistas = new ArrayList<>();
     private List<Voo> voosAguardando = new ArrayList<>();
 
+    //ver imediatamente
     private volatile boolean sistemaAtivo = true;
 
     // cadastro
@@ -43,22 +44,17 @@ public class TorreDeControle implements Runnable {
             copia = new ArrayList<>(voosAguardando);
         }
 
-        // --- PARTE 1: CONSUMO DE COMBUSTÍVEL NA ESPERA ---
         for (Voo voo : copia) {
             // Se o voo é de POUSO, ele está gastando combustível dando voltas
             if (voo.getTipo() == Voo.TipoOperacao.POUSO) {
                 voo.getAeronave().consumirCombustivel(100.0);
 
-                // Recalcula prioridade (Se baixar de 10%, vira Emergência 5 automaticamente)
                 voo.getAeronave().atualizaPrioridade();
             }
         }
 
-        // --- PARTE 2: REORGANIZA A FILA PELA PRIORIDADE ---
-        // Quem ficou sem combustível (Prio 5) pula para o começo da lista agora!
         copia.sort(Comparator.comparingInt(Voo::getPrioridade).reversed());
 
-        // --- PARTE 3: TENTA ALOCAR PISTA ---
         for (Voo voo : copia) {
 
             Aeronave aeronave = voo.getAeronave();
@@ -66,29 +62,23 @@ public class TorreDeControle implements Runnable {
                 continue; // segurança
             }
 
-            // Agora buscamos pista compatível com o TAMANHO da aeronave
+            // Agora buscamos pista compatível com o tamanho da aeronave
             Pista pistaLivre = buscarPistaDisponivel(aeronave);
 
             if (pistaLivre == null) {
-                // Nenhuma pista livre que suporte o tamanho dessa aeronave
                 continue;
             }
 
-            // --- ACHOU PISTA! VAMOS LANÇAR O VOO ---
-
-            // Remove da espera
             synchronized (voosAguardando) {
                 voosAguardando.remove(voo);
             }
 
-            // Adiciona na lista visual de "Em Operação"
             synchronized (aeronavesEmOperacao) {
                 aeronavesEmOperacao.add(aeronave);
             }
 
             // Tenta ocupar a pista fisicamente, já validando tamanho
             if (!pistaLivre.ocupar(aeronave)) {
-                // Se por algum motivo falhar (concorrência), volta pra fila na próxima iteração
                 continue;
             }
 
@@ -107,29 +97,6 @@ public class TorreDeControle implements Runnable {
                     + " na " + pistaLivre.getId());
         }
     }
-    public List<Aeronave> obterCopiaFilaPrioridade() {
-        synchronized (aeronavesDisponiveis) {
-            List<Aeronave> copia = new ArrayList<>(aeronavesDisponiveis);
-            // ordena da MAIOR prioridade de pouso para a menor
-            copia.sort(Comparator.comparingInt(Aeronave::getPrioridadePouso).reversed());
-            return copia;
-        }
-    }
-
-    // Seleciona aeronave "mais adequada" — neste exemplo: maior prioridade
-    private Aeronave selecionarAeronaveMaisAdequada() {
-        synchronized (aeronavesDisponiveis) {
-            Aeronave melhor = null;
-            for (Aeronave a : aeronavesDisponiveis) {
-                if (melhor == null || a.getPrioridadePouso() > melhor.getPrioridadePouso()) {
-                    melhor = a;
-                }
-            }
-            return melhor;
-        }
-    }
-
-    // Agora escolhe pista com base no tamanho da aeronave
     private Pista buscarPistaDisponivel(Aeronave aeronave) {
         synchronized (pistas) {
             Pista melhor = null;
@@ -144,7 +111,6 @@ public class TorreDeControle implements Runnable {
                     continue;
                 }
 
-                // Regra: escolhe a MENOR pista que ainda caiba na aeronave
                 if (melhor == null || p.getTamanhoMaximoPista() < melhor.getTamanhoMaximoPista()) {
                     melhor = p;
                 }
@@ -154,12 +120,6 @@ public class TorreDeControle implements Runnable {
         }
     }
 
-    // wrappers sincronizados
-    private void sincronizadoRemoverAeronaveDisponivel(Aeronave a) {
-        synchronized (aeronavesDisponiveis) {
-            aeronavesDisponiveis.remove(a);
-        }
-    }
     private void sincronizadoAddAeronaveDisponivel(Aeronave a) {
         synchronized (aeronavesDisponiveis) {
             aeronavesDisponiveis.add(a);

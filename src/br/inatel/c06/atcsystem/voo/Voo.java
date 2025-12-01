@@ -9,9 +9,9 @@ public class Voo implements Runnable {
 
     public enum StatusVoo {AGUARDANDO, EM_OPERACAO, FINALIZADO}
 
-    private final String codigo;
-    private final String origem;
-    private final String destino;
+    private String codigo;
+    private String origem;
+    private String destino;
     private Aeronave aeronave; // atribuída pelo ATC
     private Pista pista;       // atribuída pelo ATC
     private TipoOperacao tipo;
@@ -19,7 +19,7 @@ public class Voo implements Runnable {
     private TorreDeControle controle; // para callback na finalização
 
     // tempo em ms para simular operação (3 segundos para demonstração)
-    private static final long TEMPO_OPERACAO_MS = 3000L;
+    private static long TEMPO_OPERACAO_MS = 3000L;
 
     public Voo(String codigo, String origem, String destino, TipoOperacao tipo, Aeronave aeronave) {
         this.codigo = codigo;
@@ -27,11 +27,6 @@ public class Voo implements Runnable {
         this.destino = destino;
         this.tipo = tipo;
         this.status = StatusVoo.AGUARDANDO;
-        this.aeronave = aeronave;
-    }
-
-    // SETTERS usados pelo ATC
-    public void setAeronave(Aeronave aeronave) {
         this.aeronave = aeronave;
     }
 

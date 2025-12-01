@@ -17,10 +17,6 @@ public class Carga {
         this.perecivel = perecivel;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
     public double getPeso() {
         return peso;
     }
@@ -35,10 +31,7 @@ public class Carga {
 
     @Override
     public String toString() {
-        return "Carga: " + nome  +
-                ", peso=" + peso +
-                ", sensivel=" + sensivel +
-                ", perecivel=" + perecivel;
+        return "Carga: " + nome;
     }
 
 }

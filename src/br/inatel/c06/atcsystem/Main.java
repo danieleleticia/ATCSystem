@@ -29,9 +29,9 @@ public class Main
         //torre.adicionarPista(pista3);
 
         // 3. Criar aeronaves
-        AeronaveComercial aviao1 = new AeronaveComercial("Boeing 737", "PT-ABC", 5000, 70000,39, 2, "Azul", 150);
+        AeronaveComercial aviao1 = new AeronaveComercial("Boeing737", "PT-ABC", 5000, 70000, 39, 2,"Azul", 150);
         AeronaveComercial aviao2 = new AeronaveComercial("Airbus A320", "PT-XYZ", 4500, 65000, 37,1, "Gol", 120);
-        AeronaveCarga cargueiro = new AeronaveCarga("Boeing 747", "PT-CGO", 8000, 200000, 71,1, 70000);
+        AeronaveCarga cargueiro = new AeronaveCarga("Boeing 747", "PT-CGO", 8000, 2000, 71,1, 70000);
 
         // Adicionar cargas ao cargueiro
         cargueiro.adicionarCarga(new Carga(15000, "Vacina" , false, true));  // Carga perecível
@@ -62,7 +62,6 @@ public class Main
         torre.adicionarVoo(voo2);
         torre.adicionarVoo(voo3);
 
-        // >>> LOG: fila de prioridade INICIAL dos voos
         LogSistema.limparLog();
         LogSistema.registrarMensagem("Iniciando simulação...");
 
@@ -93,8 +92,6 @@ public class Main
             e.printStackTrace();
         }
 
-        // >>> LOG: fila de prioridade FINAL dos voos (os que sobraram na fila)
-        //LogSistema.registrarFilaFinal(torre.obterCopiaFilaPrioridade());
         LogSistema.registrarMensagem("Sistema finalizado.");
 
         System.out.println("\n=== SISTEMA FINALIZADO ===");

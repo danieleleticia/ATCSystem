@@ -7,7 +7,7 @@ public class AeronaveComercial extends Aeronave{
 
     public AeronaveComercial(String modelo, String matricula, double combustivel, double pesoAtual, double tamanho, int prioridadeAtual, String companhia, int qtdPassageiros) {
 
-        super(modelo, matricula, combustivel, pesoAtual, tamanho  , prioridadeAtual);
+        super(modelo, matricula, combustivel, tamanho , pesoAtual, prioridadeAtual);
 
         if (qtdPassageiros < 0) {
             throw new IllegalArgumentException("A quantidade de passageiros não pode ser negativa.");
@@ -42,7 +42,8 @@ public class AeronaveComercial extends Aeronave{
     }
 
     @Override
-    public String exibirInformacoes() {
+    public String exibirInformacoes()
+    {
         return  "Aeronave Comercial [" + modelo + " - " + matricula + ", Companhia: " + companhia + ", Passageiros: " + qtdPassageiros + "]";
     }
 }

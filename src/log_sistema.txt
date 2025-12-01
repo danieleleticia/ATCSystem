@@ -5,5 +5,7 @@
 3) [PRIO=3] Voo Voo-003 - Aeronave PT-CGO
 ==============================
 
-[ALOCACAO] Voo-002 assumiu a pista Pista 01, ocupada com PT-XYZ
-[ALOCACAO] Voo-003 assumiu a pista Pista 02, ocupada com PT-CGO
+[ALOCACAO] Voo-002 assumiu a pista Pista Pista 02 (tamanho máximo: 1800.0), ocupadacom PT-XYZ
+[ALOCACAO] Voo-003 assumiu a pista Pista Pista 01 (tamanho máximo: 3000.0), ocupadacom PT-CGO
+[ALOCACAO] Voo-001 assumiu a pista Pista Pista 02 (tamanho máximo: 1800.0), ocupadacom PT-ABC
+[LOG] Sistema finalizado.

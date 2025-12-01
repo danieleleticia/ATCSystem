@@ -12,7 +12,7 @@ public abstract class Aeronave {
     protected double tamanho;
     protected int prioridadeAtual;
 
-    public Aeronave(String modelo, String matricula, double combustivel,double combustivelInicial,double tamanho, double pesoAtual) {
+    public Aeronave(String modelo, String matricula, double combustivel,double tamanho, double pesoAtual, int prioridadeAtual) {
         if (combustivel < 0) {
             throw new CombustivelInvalidoException("O combustível não pode ser negativo.");
         }
@@ -31,22 +31,15 @@ public abstract class Aeronave {
         this.modelo = modelo;
         this.matricula = normalizaMatricula(matricula);
         this.combustivel = combustivel;
+        this.tamanho = tamanho;
         this.pesoAtual = pesoAtual;
         this.prioridadeAtual = prioridadeAtual;
-        this.tamanho = tamanho;
+
     }
 
-
-    public String getModelo() {
-        return modelo;
-    }
     public String getMatricula() {
         return matricula;
     }
-    public double getCombustivel() {
-        return combustivel;
-    }
-    public double getPesoAtual() {return pesoAtual;}
     public double getTamanho() {return tamanho;}
 
     private String normalizaMatricula(String matricula) {
@@ -77,10 +70,5 @@ public abstract class Aeronave {
             combustivel = 0;
         }
 
-    }
-
-    public void emergenciaCombustivel() {
-        prioridadeAtual = 5;
-        System.out.println("Aeronave " + matricula + " em EMERGÊNCIA por combustível crítico!");
     }
 }

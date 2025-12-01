@@ -5,7 +5,6 @@ import br.inatel.c06.atcsystem.aeronave.Aeronave;
 public class Pista {
 
     private String id;
-    // Tamanho máximo que a pista suporta (por exemplo, em metros)
     private double tamanhoMaximoPista;
     private boolean ocupada;
 
@@ -31,23 +30,14 @@ public class Pista {
         return ocupada;
     }
 
-    /**
-     * Verifica se um determinado tamanho de aeronave pode usar esta pista.
-     */
     public boolean suportaTamanho(double tamanhoAeronave) {
         return tamanhoAeronave <= tamanhoMaximoPista;
     }
 
-    /**
-     * Verifica se a aeronave pode usar esta pista com base no seu tamanho.
-     */
     public boolean suportaAeronave(Aeronave aeronave) {
         return aeronave != null && suportaTamanho(aeronave.getTamanho());
     }
 
-    /**
-     * Ocupa a pista sem verificar tamanho de aeronave (mantido para compatibilidade).
-     */
     public synchronized boolean ocupar() {
         if (ocupada) {
             return false;
@@ -56,10 +46,6 @@ public class Pista {
         return true;
     }
 
-    /**
-     * Versão de ocupar que já verifica se a aeronave cabe na pista.
-     * Se não couber ou já estiver ocupada, retorna false.
-     */
     public synchronized boolean ocupar(Aeronave aeronave) {
         if (ocupada) {
             return false;
@@ -71,9 +57,7 @@ public class Pista {
         return true;
     }
 
-    /**
-     * Libera a pista.
-     */
+
     public synchronized void liberar() {
         ocupada = false;
     }
