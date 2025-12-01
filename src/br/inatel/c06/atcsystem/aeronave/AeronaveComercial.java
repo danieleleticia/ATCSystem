@@ -5,9 +5,9 @@ public class AeronaveComercial extends Aeronave{
     private int qtdPassageiros;
     private boolean emergencia = false;
 
-    public AeronaveComercial(String modelo, String matricula, double combustivel, double pesoAtual, int prioridadeAtual, String companhia, int qtdPassageiros) {
+    public AeronaveComercial(String modelo, String matricula, double combustivel, double pesoAtual, double tamanho, int prioridadeAtual, String companhia, int qtdPassageiros) {
 
-        super(modelo, matricula, combustivel, pesoAtual, prioridadeAtual);
+        super(modelo, matricula, combustivel, pesoAtual, tamanho  , prioridadeAtual);
 
         if (qtdPassageiros < 0) {
             throw new IllegalArgumentException("A quantidade de passageiros não pode ser negativa.");

@@ -8,13 +8,11 @@ public abstract class Aeronave {
     protected String modelo;
     protected String matricula;
     protected double combustivel;
-    protected double combustivelInicial;
     protected double pesoAtual;
+    protected double tamanho;
     protected int prioridadeAtual;
 
-
-    public Aeronave(String modelo, String matricula, double combustivel,double combustivelInicial, double pesoAtual, int prioridadeAtual) {
-
+    public Aeronave(String modelo, String matricula, double combustivel,double combustivelInicial,double tamanho, double pesoAtual) {
         if (combustivel < 0) {
             throw new CombustivelInvalidoException("O combustível não pode ser negativo.");
         }
@@ -23,31 +21,21 @@ public abstract class Aeronave {
             throw new PrioridadeInvalidaException("A prioridade deve estar entre 1 e 5.");
         }
 
-        this.modelo = modelo;
-        this.matricula = normalizaMatricula(matricula);
-        this.combustivel = combustivel;
-        this.pesoAtual = pesoAtual;
-        this.prioridadeAtual = prioridadeAtual;
-    }
-
-    //sobrecarga
-    public Aeronave(String modelo, String matricula, double combustivel, double pesoAtual, int prioridadeAtual) {
-
-        if (combustivel < 0) {
-            throw new CombustivelInvalidoException("O combustível não pode ser negativo.");
+        if(tamanho <= 0) {
+            throw new IllegalArgumentException("Tamanho deve ser positivo.");
         }
-
-        if (prioridadeAtual < 1 || prioridadeAtual > 5) {
-            throw new PrioridadeInvalidaException("A prioridade deve estar entre 1 e 5.");
+        if (pesoAtual < 0) {
+            throw new IllegalArgumentException("Peso deve ser positivo.");
         }
 
         this.modelo = modelo;
         this.matricula = normalizaMatricula(matricula);
         this.combustivel = combustivel;
-        this.combustivelInicial = combustivel;
         this.pesoAtual = pesoAtual;
         this.prioridadeAtual = prioridadeAtual;
+        this.tamanho = tamanho;
     }
+
 
     public String getModelo() {
         return modelo;
@@ -58,13 +46,8 @@ public abstract class Aeronave {
     public double getCombustivel() {
         return combustivel;
     }
-    public double getPesoAtual() {
-        return pesoAtual;
-    }
-    public int getPrioridadeAtual() {
-        return prioridadeAtual;
-    }
-    public double getCombustivelInicial() {return combustivelInicial;}
+    public double getPesoAtual() {return pesoAtual;}
+    public double getTamanho() {return tamanho;}
 
     private String normalizaMatricula(String matricula) {
         if (matricula == null) {
@@ -94,21 +77,10 @@ public abstract class Aeronave {
             combustivel = 0;
         }
 
-        if (isCombustivelCritico()) {
-            emergenciaCombustivel();
-        }
-    }
-
-    public boolean isCombustivelCritico() {
-        if (combustivelInicial<= 0) {
-            return false; // evita divisão esquisita
-        }
-        return combustivel <= combustivelInicial * 0.10;
     }
 
     public void emergenciaCombustivel() {
         prioridadeAtual = 5;
         System.out.println("Aeronave " + matricula + " em EMERGÊNCIA por combustível crítico!");
     }
-
 }

@@ -1,45 +1,11 @@
-[LOG] Sistema inicializado.
-==== Fila inicial de prioridades (Voos) ====
-1) [PRIO=0] Voo Voo-001 (Confins -> Guarulhos)
-2) [PRIO=0] Voo Voo-002 (Salvador -> Brasília)
-3) [PRIO=0] Voo Voo-003 (Miami -> Viracopos)
-============================================
+[LOG] Iniciando simulação...
+==== Fila inicial de Voos ====
+1) [PRIO=2] Voo Voo-001 - Aeronave PT-ABC
+2) [PRIO=5] Voo Voo-002 - Aeronave PT-XYZ
+3) [PRIO=5] Voo Voo-003 - Aeronave PT-CGO
+==============================
 
-[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-001
-[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-002
-[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-003
-
-==== Fila final de prioridades (Voos) ====
-==========================================
-
-[LOG] Sistema finalizado.
-[LOG] Sistema inicializado.
-==== Fila inicial de prioridades (Voos) ====
-1) [PRIO=0] Voo Voo-001 (Confins -> Guarulhos)
-2) [PRIO=0] Voo Voo-002 (Salvador -> Brasília)
-3) [PRIO=0] Voo Voo-003 (Miami -> Viracopos)
-============================================
-
-[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-001
-[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-002
-[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-003
-
-==== Fila final de prioridades (Voos) ====
-==========================================
-
-[LOG] Sistema finalizado.
-[LOG] Sistema inicializado.
-==== Fila inicial de prioridades (Voos) ====
-1) [PRIO=0] Voo Voo-001 (Confins -> Guarulhos)
-2) [PRIO=0] Voo Voo-002 (Salvador -> Brasília)
-3) [PRIO=0] Voo Voo-003 (Miami -> Viracopos)
-============================================
-
-[ALOCACAO] Aeronave PT-XYZ (prio=5) -> Voo Voo-001
-[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-002
-[ALOCACAO] Aeronave PT-CGO (prio=5) -> Voo Voo-003
-
-==== Fila final de prioridades (Voos) ====
-==========================================
-
+[ALOCACAO] Voo-002 assumiu a pista com PT-XYZ
+[ALOCACAO] Voo-003 assumiu a pista com PT-CGO
+[ALOCACAO] Voo-001 assumiu a pista com PT-ABC
 [LOG] Sistema finalizado.

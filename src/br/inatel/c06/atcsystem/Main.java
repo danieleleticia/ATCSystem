@@ -20,22 +20,23 @@ public class Main
         TorreDeControle torre = new TorreDeControle();
 
         // 2. Criar pistas
-        Pista pista1 = new Pista("Pista 01");
-        Pista pista2 = new Pista("Pista 02");
-        // Pista pista3 = new Pista("Pista 03");
+        Pista pista1 = new Pista("Pista 01", 3000);  // pista grande, suporta wide-body
+        Pista pista2 = new Pista("Pista 02", 1800);  // pista média
+        Pista pista3 = new Pista("Pista 03", 1200);  // pista pequena/regional
+
         torre.adicionarPista(pista1);
         torre.adicionarPista(pista2);
         //torre.adicionarPista(pista3);
 
         // 3. Criar aeronaves
-        AeronaveComercial aviao1 = new AeronaveComercial("Boeing 737", "PT-ABC", 5000, 70000, 2, "Azul", 150);
-        AeronaveComercial aviao2 = new AeronaveComercial("Airbus A320", "PT-XYZ", 4500, 65000, 1, "Gol", 120);
-        AeronaveCarga cargueiro = new AeronaveCarga("Boeing 747", "PT-CGO", 8000, 200000, 1, 70000);
+        AeronaveComercial aviao1 = new AeronaveComercial("Boeing 737", "PT-ABC", 5000, 70000,39, 2, "Azul", 150);
+        AeronaveComercial aviao2 = new AeronaveComercial("Airbus A320", "PT-XYZ", 4500, 65000, 37,1, "Gol", 120);
+        AeronaveCarga cargueiro = new AeronaveCarga("Boeing 747", "PT-CGO", 8000, 200000, 71,1, 70000);
 
         // Adicionar cargas ao cargueiro
         cargueiro.adicionarCarga(new Carga(15000, "Vacina" , false, true));  // Carga perecível
         cargueiro.adicionarCarga(new Carga(10000, "Moveis" , false, false));  // Carga sensível (aumenta prioridade)
-        cargueiro.adicionarCarga(new Carga(30000, "Material radioativo" , true, false));
+        cargueiro.adicionarCarga(new Carga(30000, "Material" , false, false));
 
         // 4. Adicionar aeronaves à torre
         torre.adicionarAeronave(aviao1);
@@ -50,9 +51,9 @@ public class Main
         System.out.println();
 
         // 6. Criar voos
-        Voo voo1 = new Voo("Voo-001", "Confins", "Guarulhos", Voo.TipoOperacao.DECOLAGEM);
-        Voo voo2 = new Voo("Voo-002", "Salvador", "Brasília", Voo.TipoOperacao.POUSO);
-        Voo voo3 = new Voo("Voo-003", "Miami", "Viracopos", Voo.TipoOperacao.POUSO);
+        Voo voo1 = new Voo("Voo-001", "Confins", "Guarulhos", Voo.TipoOperacao.DECOLAGEM, aviao1);
+        Voo voo2 = new Voo("Voo-002", "Salvador", "Brasília", Voo.TipoOperacao.POUSO,  aviao2);
+        Voo voo3 = new Voo("Voo-003", "Miami", "Viracopos", Voo.TipoOperacao.POUSO, cargueiro);
 
         aviao2.emergenciaMedica();
 
@@ -63,8 +64,10 @@ public class Main
 
         // >>> LOG: fila de prioridade INICIAL dos voos
         LogSistema.limparLog();
-        LogSistema.registrarMensagem("Sistema inicializado.");
-        LogSistema.registrarFilaInicial(torre.obterCopiaFilaPrioridade());
+        LogSistema.registrarMensagem("Iniciando simulação...");
+
+        LogSistema.registrarFilaInicial(torre.getVoosAguardandoCopia());
+
 
         // 8. Processar voos
         System.out.println("\n=== INICIANDO PROCESSAMENTO DE VOOS ===");
@@ -91,7 +94,7 @@ public class Main
         }
 
         // >>> LOG: fila de prioridade FINAL dos voos (os que sobraram na fila)
-        LogSistema.registrarFilaFinal(torre.obterCopiaFilaPrioridade());
+        //LogSistema.registrarFilaFinal(torre.obterCopiaFilaPrioridade());
         LogSistema.registrarMensagem("Sistema finalizado.");
 
         System.out.println("\n=== SISTEMA FINALIZADO ===");

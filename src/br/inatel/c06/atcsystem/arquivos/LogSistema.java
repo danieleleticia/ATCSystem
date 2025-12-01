@@ -1,4 +1,5 @@
 package br.inatel.c06.atcsystem.arquivos;
+
 import br.inatel.c06.atcsystem.aeronave.Aeronave;
 import br.inatel.c06.atcsystem.voo.Voo;
 
@@ -11,66 +12,55 @@ import java.util.List;
 
 public class LogSistema {
 
+    // CORREÇÃO 1: Tirei o "src/" para salvar na raiz do projeto. É mais seguro.
     private static Path CAMINHO_ARQUIVO = Paths.get("src/log_sistema.txt");
 
-    // Método base: escreve uma linha no arquivo (com append)
     private static synchronized void escreverLinha(String linha) {
         try {
             Files.writeString(
                     CAMINHO_ARQUIVO,
                     linha + System.lineSeparator(),
-                    StandardOpenOption.CREATE,   // cria o arquivo se não existir
-                    StandardOpenOption.APPEND    // adiciona no final
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
             );
         } catch (IOException e) {
-            System.err.println("Erro ao escrever no log: " + e.getMessage());
+            // Imprime no console vermelho para você ver se der erro
+            System.err.println("ERRO CRÍTICO AO GRAVAR LOG: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // ---------- FILA DE AERONAVES ----------
+    // ---------- MÉTODOS ATUALIZADOS PARA RECEBER 'VOO' ----------
 
-    private static String formatarAeronave(Aeronave a) {
-        return "[PRIO=" + a.getPrioridadePouso() + "] Aeronave "
-                + a.getMatricula() + " (" + a.getModelo() + ")";
+    private static String formatarVoo(Voo v) {
+        // Agora pegamos a prioridade do VOO, que pode ter mudado
+        return "[PRIO=" + v.getPrioridade() + "] Voo " + v.getCodigo()
+                + " - Aeronave " + v.getAeronave().getMatricula();
     }
 
-    public static void registrarFilaInicial(List<Aeronave> fila) {
-        escreverLinha("==== Fila inicial de prioridades (Aeronaves) ====");
+    // Agora recebe Lista de VOO, pois é isso que a Torre tem
+    public static void registrarFilaInicial(List<Voo> filaVoos) {
+        escreverLinha("==== Fila inicial de Voos ====");
         int pos = 1;
-        for (Aeronave a : fila) {
-            escreverLinha(pos + ") " + formatarAeronave(a));
+        for (Voo v : filaVoos) {
+            escreverLinha(pos + ") " + formatarVoo(v));
             pos++;
         }
-        escreverLinha("================================================");
+        escreverLinha("==============================");
         escreverLinha("");
     }
 
-    public static void registrarFilaFinal(List<Aeronave> fila) {
-        escreverLinha("");
-        escreverLinha("==== Fila final de prioridades (Aeronaves) ====");
-        int pos = 1;
-        for (Aeronave a : fila) {
-            escreverLinha(pos + ") " + formatarAeronave(a));
-            pos++;
-        }
-        escreverLinha("===============================================");
-        escreverLinha("");
-    }
-
-    // esse pode continuar usando Aeronave, porque registra alocação:
+    // Mantivemos esse para registrar quando o avião ganha a pista
     public static void registrarAlocacao(Aeronave a, Voo v) {
-        escreverLinha("[ALOCACAO] Aeronave " + a.getMatricula()
-                + " (prio=" + a.getPrioridadePouso() + ") -> Voo " + v.getCodigo());
+        escreverLinha("[ALOCACAO] " + v.getCodigo() + " assumiu a pista " + v.getPista()+ "com " + a.getMatricula());
     }
 
-    // Se quiser registrar qualquer mensagem solta:
     public static void registrarMensagem(String mensagem) {
         escreverLinha("[LOG] " + mensagem);
     }
 
     public static void limparLog() {
         try {
-            // sobrescreve o arquivo com string vazia (sem APPEND)
             Files.writeString(
                     CAMINHO_ARQUIVO,
                     "",
@@ -78,8 +68,7 @@ public class LogSistema {
                     StandardOpenOption.TRUNCATE_EXISTING
             );
         } catch (IOException e) {
-            System.err.println("Erro ao limpar o log: " + e.getMessage());
-        }
+            System.err.println("Erro ao limpar log: " + e.getMessage());
     }
-
+    }
 }

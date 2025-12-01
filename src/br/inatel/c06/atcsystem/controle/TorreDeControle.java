@@ -10,158 +10,175 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TorreDeControle implements Runnable {
-        private List<Aeronave> aeronavesDisponiveis = new ArrayList<>();
-        private List<Aeronave> aeronavesEmOperacao = new ArrayList<>();
-        private List<Pista> pistas = new ArrayList<>();
-        private List<Voo> voosAguardando = new ArrayList<>();
+    private List<Aeronave> aeronavesDisponiveis = new ArrayList<>();
+    private List<Aeronave> aeronavesEmOperacao = new ArrayList<>();
+    private List<Pista> pistas = new ArrayList<>();
+    private List<Voo> voosAguardando = new ArrayList<>();
 
-        private volatile boolean sistemaAtivo = true;
+    private volatile boolean sistemaAtivo = true;
 
-        // cadastro
-        public void adicionarAeronave(Aeronave a) {
-            synchronized (aeronavesDisponiveis) {
-                aeronavesDisponiveis.add(a);
+    // cadastro
+    public void adicionarAeronave(Aeronave a) {
+        synchronized (aeronavesDisponiveis) {
+            aeronavesDisponiveis.add(a);
+        }
+    }
+
+    public void adicionarPista(Pista p) {
+        synchronized (pistas) {
+            pistas.add(p);
+        }
+    }
+
+    public void adicionarVoo(Voo v) {
+        v.setControle(this);
+        synchronized (voosAguardando) {
+            voosAguardando.add(v);
+        }
+    }
+
+    public void processarVoos() {
+        List<Voo> copia;
+        synchronized (voosAguardando) {
+            copia = new ArrayList<>(voosAguardando);
+        }
+
+        // --- PARTE 1: CONSUMO DE COMBUSTÍVEL NA ESPERA ---
+        for (Voo voo : copia) {
+            // Se o voo é de POUSO, ele está gastando combustível dando voltas
+            if (voo.getTipo() == Voo.TipoOperacao.POUSO) {
+                voo.getAeronave().consumirCombustivel(100.0);
+
+                // Recalcula prioridade (Se baixar de 10%, vira Emergência 5 automaticamente)
+                voo.getAeronave().atualizaPrioridade();
             }
         }
 
-        public void adicionarPista(Pista p) {
-            synchronized (pistas) {
-                pistas.add(p);
-            }
-        }
+        // --- PARTE 2: REORGANIZA A FILA PELA PRIORIDADE ---
+        // Quem ficou sem combustível (Prio 5) pula para o começo da lista agora!
+        copia.sort(Comparator.comparingInt(Voo::getPrioridade).reversed());
 
-        public void adicionarVoo(Voo v) {
-            v.setControle(this);
+        // --- PARTE 3: TENTA ALOCAR PISTA ---
+        for (Voo voo : copia) {
+
+            Aeronave aeronave = voo.getAeronave();
+            if (aeronave == null) {
+                continue; // segurança
+            }
+
+            // Agora buscamos pista compatível com o TAMANHO da aeronave
+            Pista pistaLivre = buscarPistaDisponivel(aeronave);
+
+            if (pistaLivre == null) {
+                // Nenhuma pista livre que suporte o tamanho dessa aeronave
+                continue;
+            }
+
+            // --- ACHOU PISTA! VAMOS LANÇAR O VOO ---
+
+            // Remove da espera
             synchronized (voosAguardando) {
-                voosAguardando.add(v);
+                voosAguardando.remove(voo);
             }
+
+            // Adiciona na lista visual de "Em Operação"
+            synchronized (aeronavesEmOperacao) {
+                aeronavesEmOperacao.add(aeronave);
+            }
+
+            // Tenta ocupar a pista fisicamente, já validando tamanho
+            if (!pistaLivre.ocupar(aeronave)) {
+                // Se por algum motivo falhar (concorrência), volta pra fila na próxima iteração
+                continue;
+            }
+
+            voo.setPista(pistaLivre);
+
+            // Inicia a thread do voo
+            Thread t = new Thread(voo);
+            t.setName("Voo-" + voo.getCodigo());
+            t.start();
+
+            LogSistema.registrarAlocacao(voo.getAeronave(), voo);
+
+            System.out.println("ATC: Autorizado " + voo.getTipo() + " voo " + voo.getCodigo()
+                    + " [Avião: " + voo.getAeronave().getMatricula() + "]"
+                    + " [Prioridade: " + voo.getPrioridade() + "]"
+                    + " na " + pistaLivre.getId());
         }
+    }
+    public List<Aeronave> obterCopiaFilaPrioridade() {
+        synchronized (aeronavesDisponiveis) {
+            List<Aeronave> copia = new ArrayList<>(aeronavesDisponiveis);
+            // ordena da MAIOR prioridade de pouso para a menor
+            copia.sort(Comparator.comparingInt(Aeronave::getPrioridadePouso).reversed());
+            return copia;
+        }
+    }
 
-        /**
-         * Processa os voos aguardando:
-         * - ordena por prioridade (maior primeiro)
-         * - para cada voo tenta alocar aeronave e pista
-         * - dispara thread do voo
-         */
-        public void processarVoos() {
-            // cria cópia para evitar concorrência durante iteração
-            List<Voo> copia;
-            synchronized (voosAguardando) {
-                copia = new ArrayList<>(voosAguardando);
+    // Seleciona aeronave "mais adequada" — neste exemplo: maior prioridade
+    private Aeronave selecionarAeronaveMaisAdequada() {
+        synchronized (aeronavesDisponiveis) {
+            Aeronave melhor = null;
+            for (Aeronave a : aeronavesDisponiveis) {
+                if (melhor == null || a.getPrioridadePouso() > melhor.getPrioridadePouso()) {
+                    melhor = a;
+                }
             }
+            return melhor;
+        }
+    }
 
-            // ordena por prioridade (aeronave)
-            copia.sort(Comparator.comparingInt(Voo::getPrioridade).reversed());
+    // Agora escolhe pista com base no tamanho da aeronave
+    private Pista buscarPistaDisponivel(Aeronave aeronave) {
+        synchronized (pistas) {
+            Pista melhor = null;
 
-            for (Voo voo : copia) {
-                // já atribuído? pula
-                if (voo.getAeronave() != null) continue;
-
-                Aeronave a = selecionarAeronaveMaisAdequada();
-                if (a == null) {
-                    System.out.println("ATC: nenhuma aeronave disponível para voo " + voo.getCodigo());
+            for (Pista p : pistas) {
+                if (p.estaOcupada()) {
                     continue;
                 }
 
-                Pista pistaLivre = buscarPistaDisponivel();
-                if (pistaLivre == null) {
-                    System.out.println("ATC: nenhuma pista disponível para voo " + voo.getCodigo());
+                // A pista precisa suportar o tamanho da aeronave
+                if (!p.suportaAeronave(aeronave)) {
                     continue;
                 }
 
-                // Marca aeronave em operação (removendo das disponíveis)
-                sincronizadoRemoverAeronaveDisponivel(a);
-                synchronized (aeronavesEmOperacao) {
-                    aeronavesEmOperacao.add(a);
+                // Regra: escolhe a MENOR pista que ainda caiba na aeronave
+                if (melhor == null || p.getTamanhoMaximoPista() < melhor.getTamanhoMaximoPista()) {
+                    melhor = p;
                 }
-
-                // Ocupa a pista (síncrono)
-                boolean ocupou = pistaLivre.ocupar();
-                if (!ocupou) {
-                    // caso raro: alguém ocupou entre busca e ocupar
-                    sincronizadoAddAeronaveDisponivel(a);
-                    synchronized (aeronavesEmOperacao) { aeronavesEmOperacao.remove(a); }
-                    continue;
-                }
-
-                // Atribui recursos ao voo
-                voo.setAeronave(a);
-                voo.setPista(pistaLivre);
-
-                // Inicia o voo em uma nova thread
-                Thread t = new Thread(voo);
-                t.setName("Voo-" + voo.getCodigo());
-                t.start();
-
-                LogSistema.registrarAlocacao(a, voo);
-
-                // Remove voo da lista aguardando (será notificado quando finalizar)
-                synchronized (voosAguardando) {
-                    voosAguardando.remove(voo);
-                }
-
-                System.out.println("ATC: Disparado voo " + voo.getCodigo()
-                        + " com aeronave " + a.getMatricula()
-                        + " na pista " + pistaLivre.getId());
-            }
-        }
-
-        public List<Aeronave> obterCopiaFilaPrioridade() {
-            synchronized (aeronavesDisponiveis) {
-                List<Aeronave> copia = new ArrayList<>(aeronavesDisponiveis);
-                // ordena da MAIOR prioridade de pouso para a menor
-                copia.sort(Comparator.comparingInt(Aeronave::getPrioridadePouso).reversed());
-                return copia;
-            }
-        }
-
-        // Seleciona aeronave "mais adequada" — neste exemplo: maior prioridade
-        private Aeronave selecionarAeronaveMaisAdequada() {
-            synchronized (aeronavesDisponiveis) {
-                Aeronave melhor = null;
-                for (Aeronave a : aeronavesDisponiveis) {
-                    if (melhor == null || a.getPrioridadePouso() > melhor.getPrioridadePouso()) {
-                        melhor = a;
-                    }
-                }
-                return melhor;
-            }
-        }
-
-        private Pista buscarPistaDisponivel() {
-            synchronized (pistas) {
-                for (Pista p : pistas) {
-                    if (!p.estaOcupada()) return p;
-                }
-                return null;
-            }
-        }
-
-        // wrappers sincronizados
-        private void sincronizadoRemoverAeronaveDisponivel(Aeronave a) {
-            synchronized (aeronavesDisponiveis) {
-                aeronavesDisponiveis.remove(a);
-            }
-        }
-        private void sincronizadoAddAeronaveDisponivel(Aeronave a) {
-            synchronized (aeronavesDisponiveis) {
-                aeronavesDisponiveis.add(a);
-            }
-        }
-        public void notificarVooFinalizado(Voo voo) {
-            Aeronave a = voo.getAeronave();
-            if (a != null) {
-                // remove de emOperacao e volta para disponiveis
-                synchronized (aeronavesEmOperacao) {
-                    aeronavesEmOperacao.remove(a);
-                }
-                sincronizadoAddAeronaveDisponivel(a);
-                System.out.println("ATC: Aeronave " + a.getMatricula() + " retornou para disponibilidade.");
             }
 
-            // Pista já foi liberada pelo próprio Voo -> nada a fazer aqui
-            System.out.println("ATC: Voo " + voo.getCodigo() + " finalizado e processado.");
+            return melhor;
         }
+    }
+
+    // wrappers sincronizados
+    private void sincronizadoRemoverAeronaveDisponivel(Aeronave a) {
+        synchronized (aeronavesDisponiveis) {
+            aeronavesDisponiveis.remove(a);
+        }
+    }
+    private void sincronizadoAddAeronaveDisponivel(Aeronave a) {
+        synchronized (aeronavesDisponiveis) {
+            aeronavesDisponiveis.add(a);
+        }
+    }
+    public void notificarVooFinalizado(Voo voo) {
+        Aeronave a = voo.getAeronave();
+        if (a != null) {
+            // remove de emOperacao e volta para disponiveis
+            synchronized (aeronavesEmOperacao) {
+                aeronavesEmOperacao.remove(a);
+            }
+            sincronizadoAddAeronaveDisponivel(a);
+            System.out.println("ATC: Aeronave " + a.getMatricula() + " retornou para disponibilidade.");
+        }
+
+        // Pista já foi liberada pelo próprio Voo -> nada a fazer aqui
+        System.out.println("ATC: Voo " + voo.getCodigo() + " finalizado e processado.");
+    }
 
     @Override
     public void run() {
@@ -182,11 +199,13 @@ public class TorreDeControle implements Runnable {
         System.out.println("ATC: Por hoje é só");
     }
 
+    public List<Voo> getVoosAguardandoCopia() {
+        synchronized (voosAguardando) {
+            return new ArrayList<>(voosAguardando);
+        }
+    }
+
     public void desligar() {
         sistemaAtivo = false;
     }
-
-
 }
-
-

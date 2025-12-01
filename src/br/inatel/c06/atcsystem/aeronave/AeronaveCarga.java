@@ -9,9 +9,9 @@ public class AeronaveCarga extends Aeronave {
     private double capacidadeMaxCarga;
     private ArrayList<Carga> listaCargas;
 
-    public AeronaveCarga(String modelo, String matricula, double combustivel, double pesoAtual, int prioridadeAtual, double capacidadeMaxCarga) {
+    public AeronaveCarga(String modelo, String matricula, double combustivel, double pesoAtual, double tamanho, int prioridadeAtual, double capacidadeMaxCarga) {
 
-        super(modelo, matricula, combustivel, pesoAtual, prioridadeAtual);
+        super(modelo, matricula, combustivel, pesoAtual,tamanho, prioridadeAtual);
 
         if (capacidadeMaxCarga <= 0) {
             throw new IllegalArgumentException("A capacidade máxima de carga deve ser positiva.");
